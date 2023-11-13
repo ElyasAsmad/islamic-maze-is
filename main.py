@@ -3,6 +3,8 @@ import sys
 import random
 import pygame
 
+# TODO: Implement A* algorithm to automatically move player
+
 class Player(object):
     
     def __init__(self):
@@ -48,10 +50,10 @@ pygame.display.set_caption("ISlamic Maze Quiz - Intelligent System")
 screen = pygame.display.set_mode((320, 240))
 
 clock = pygame.time.Clock()
-walls = [] # List to hold the walls
-player = Player() # Create the player
+walls = []
+player = Player() # Instantiate the player
 
-# Holds the level layout in a list of strings.
+# Game layout
 level = [
     "WWWWWWWWWWWWWWWWWWWW",
     "W                  W",
@@ -70,7 +72,7 @@ level = [
     "WWWWWWWWWWWWWWWWWWWW",
 ]
 
-# Translate the level string above into a real map. W = wall, E = exit
+# Translate the level string above into a real game map. W = wall, E = exit
 x = y = 0
 for row in level:
     for col in row:
@@ -83,6 +85,7 @@ for row in level:
     x = 0
 
 running = True
+
 while running:
     
     clock.tick(60)
