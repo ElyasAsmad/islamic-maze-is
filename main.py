@@ -4,6 +4,7 @@ import random
 import pygame
 
 # TODO: Implement A* algorithm to automatically move player
+# TODO: Use tkinter as game starting GUI
 
 class Player(object):
     
