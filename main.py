@@ -2,6 +2,8 @@ import os
 import sys
 import random
 import pygame
+import tkinter as tk
+from tkinter import messagebox
 
 # TODO: Implement A* algorithm to automatically move player
 # TODO: Use tkinter as game starting GUI
@@ -41,6 +43,87 @@ class Wall(object):
     def __init__(self, pos):
         walls.append(self)
         self.rect = pygame.Rect(pos[0], pos[1], 16, 16)
+
+
+# List of Islamic codes/questions
+islamic_codes = [
+    "What is the first pillar of Islam?",
+    "Who is the final prophet in Islam?",
+    "What is the holy book of Islam?",
+    "In which month do Muslims fast?",
+    "What is the pilgrimage to Mecca called?",
+    "What is the significance of Laylat al-Qadr?",
+    "How many times a day do Muslims pray?",
+    "What is the meaning of 'Sadaqah'?",
+    "What is the Islamic concept of monotheism?",
+    "What is the meaning of 'Jihad' in Islam?"
+]
+
+# Corresponding list of answers
+islamic_answers = [
+    "Shahada",
+    "Muhammad",
+    "Quran",
+    "Ramadan",
+    "Hajj",
+    "Night of Power",
+    "Five",
+    "Voluntary charity",
+    "Tawhid",
+    "Striving or struggling"
+]
+
+class IslamicQuizApp:
+    def __init__(self, master):
+        self.master = master
+        self.master.title("Islamic Codes Quiz")
+
+        self.label = tk.Label(master, text="Islamic Codes Quiz", font=("Helvetica", 16))
+        self.label.pack(pady=10)
+
+        self.question_number = 0
+        self.score = 0
+
+        self.question_text = tk.StringVar()
+        self.question_text.set(islamic_codes[self.question_number])
+
+        self.question_label = tk.Label(master, textvariable=self.question_text, font=("Helvetica", 12))
+        self.question_label.pack(pady=20)
+
+        self.answer_entry = tk.Entry(master)
+        self.answer_entry.pack(pady=10)
+
+        self.submit_button = tk.Button(master, text="Submit Answer", command=self.check_answer)
+        self.submit_button.pack(pady=10)
+
+    def check_answer(self):
+        user_answer = self.answer_entry.get().strip().lower()
+        correct_answer = islamic_answers[self.question_number].lower()
+
+        if user_answer == correct_answer:
+            messagebox.showinfo("Correct!", "Your answer is correct!")
+            self.score += 1
+        else:
+            correct_answer_message = f"The correct answer is: {correct_answer}"
+            messagebox.showinfo("Incorrect!", correct_answer_message)
+
+        self.question_number += 1
+
+        if self.question_number < len(islamic_codes):
+            self.question_text.set(islamic_codes[self.question_number])
+            self.answer_entry.delete(0, tk.END)
+        else:
+            self.show_final_score()
+
+    def show_final_score(self):
+        final_score_message = f"You got {self.score} out of {len(islamic_codes)} questions correct."
+        messagebox.showinfo("Quiz Completed", final_score_message)
+        self.master.destroy()
+
+def switch_to_quiz():
+    root = tk.Tk()
+    app = IslamicQuizApp(root)
+    root.mainloop()
 
 # Initialise pygame
 os.environ["SDL_VIDEO_CENTERED"] = "1"
@@ -111,6 +194,7 @@ while running:
 
     # Just added this to make it slightly fun ;)
     if player.rect.colliderect(end_rect):
+        switch_to_quiz()
         pygame.quit()
         sys.exit()
 
