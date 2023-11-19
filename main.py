@@ -2,9 +2,10 @@ import os
 import sys
 import random
 import pygame
+import tkinter as tk
+from tkinter import messagebox
 
-# TODO: Implement A* algorithm to automatically move player
-# TODO: Use tkinter as game starting GUI
+walls = []
 
 class Player(object):
     
@@ -36,92 +37,212 @@ class Player(object):
                 if dy < 0: # Moving up; Hit the bottom side of the wall
                     self.rect.top = wall.rect.bottom
 
-class Wall(object):
-    
+class Wall:
     def __init__(self, pos):
         walls.append(self)
         self.rect = pygame.Rect(pos[0], pos[1], 16, 16)
+class IslamicQuizApp:
+    def __init__(self, master):
+        self.master = master
+        self.master.title("Islamic Codes Quiz")
 
-# Initialise pygame
-os.environ["SDL_VIDEO_CENTERED"] = "1"
-pygame.init()
+        self.label = tk.Label(master, text="Islamic Codes Quiz", font=("Helvetica", 16))
+        self.label.pack(pady=10)
 
-# Set up the display
-pygame.display.set_caption("ISlamic Maze Quiz - Intelligent System")
-screen = pygame.display.set_mode((320, 240))
+        self.question_number = 0
+        self.score = 0
 
-clock = pygame.time.Clock()
-walls = []
-player = Player() # Instantiate the player
+        self.question_text = tk.StringVar()
+        self.question_text.set(question[self.question_number])
 
-# Game layout
-level = [
-    "WWWWWWWWWWWWWWWWWWWW",
-    "W                  W",
-    "W         WWWWWW   W",
-    "W   WWWW       W   W",
-    "W   W        WWWW  W",
-    "W WWW  WWWW        W",
-    "W   W     W W      W",
-    "W   W     W   WWW WW",
-    "W   WWW WWW   W W  W",
-    "W     W   W   W W  W",
-    "WWW   W   WWWWW W  W",
-    "W W      WW        W",
-    "W W   WWWW   WWW   W",
-    "W     W    E   W   W",
-    "WWWWWWWWWWWWWWWWWWWW",
-]
+        self.question_label = tk.Label(master, textvariable=self.question_text, font=("Helvetica", 12))
+        self.question_label.pack(pady=20)
 
-# Translate the level string above into a real game map. W = wall, E = exit
-x = y = 0
-for row in level:
-    for col in row:
-        if col == "W":
-            Wall((x, y))
-        if col == "E":
-            end_rect = pygame.Rect(x, y, 16, 16)
-        x += 16
-    y += 16
-    x = 0
+        self.answer_entry = tk.Entry(master)
+        self.answer_entry.pack(pady=10)
 
-running = True
+        self.submit_button = tk.Button(master, text="Submit Answer", command=self.check_answer)
+        self.submit_button.pack(pady=10)
 
-while running:
-    
-    clock.tick(60)
-    
-    for e in pygame.event.get():
-        if e.type == pygame.QUIT:
-            running = False
-        if e.type == pygame.KEYDOWN and e.key == pygame.K_ESCAPE:
-            running = False
-            
-        # Player movement when keyboard key is pressed
-        if e.type == pygame.KEYDOWN:
-            if e.key == pygame.K_LEFT:
-                player.move(-16, 0)
-            if e.key == pygame.K_RIGHT:
-                player.move(16, 0)
-            if e.key == pygame.K_UP:
-                player.move(0, -16)
-            if e.key == pygame.K_DOWN:
-                player.move(0, 16)
+    def check_answer(self):
+        user_answer = self.answer_entry.get()
+        correct_answer = answers[self.question_number]
 
+        if user_answer.lower() == correct_answer.lower():
+            messagebox.showinfo("Correct!", "Your answer is correct!")
+            self.score += 1
+        else:
+            messagebox.showerror("Incorrect!", "Sorry, that's incorrect.")
 
-    # Just added this to make it slightly fun ;)
-    if player.rect.colliderect(end_rect):
+        self.question_number += 1
+
+        if self.question_number < len(question):
+            self.question_text.set(question[self.question_number])
+            self.answer_entry.delete(0, tk.END)
+        else:
+            messagebox.showinfo("Quiz Completed", f"Quiz finished! Your final score: {self.score}/{len(question)}")
+            sys.exit()
+
+def game(lmaze, level):
+    global walls  # Use the global walls list
+    os.environ["SDL_VIDEO_CENTERED"] = "1"
+    pygame.init()
+    pygame.display.set_caption("Islamic Maze Quiz - Intelligent System")
+    screen = pygame.display.set_mode((320, 240))
+    clock = pygame.time.Clock()
+    player = Player()
+    if level == 4:
         pygame.quit()
         sys.exit()
 
-    # Draw the scene
-    screen.fill((0, 0, 0))
-    for wall in walls:
-        pygame.draw.rect(screen, (255, 255, 255), wall.rect)
-    pygame.draw.rect(screen, (255, 0, 0), end_rect)
-    pygame.draw.rect(screen, (255, 200, 0), player.rect)
-    # gfxdraw.filled_circle(screen, 255, 200, 5, (0,128,0))
-    pygame.display.flip()
-    clock.tick(360)
+    x = y = 0
+    end_rect = None
+    for row in lmaze[level]:
+        for col in row:
+            if col == "W":
+                walls.append(Wall((x, y)))  # Append walls to the list
+            if col == "E":
+                end_rect = pygame.Rect(x, y, 16, 16)
+            x += 16
+        y += 16
+        x = 0
 
-pygame.quit()
+    running = True
+
+    while running:
+        clock.tick(60)
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                running = False
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_LEFT:
+                    player.move(-16, 0)
+                if event.key == pygame.K_RIGHT:
+                    player.move(16, 0)
+                if event.key == pygame.K_UP:
+                    player.move(0, -16)
+                if event.key == pygame.K_DOWN:
+                    player.move(0, 16)
+
+        if player.rect.colliderect(end_rect):
+            if level + 1 < len(lmaze):
+                if quiz(level):
+                    game(lmaze, level + 1)  # Call next level
+            else:
+                messagebox.showinfo("Game Completed", "You've completed all levels!")
+                pygame.quit()
+                sys.exit()
+
+        screen.fill((0, 0, 0))
+        for wall in walls:
+            pygame.draw.rect(screen, (255, 255, 255), wall.rect)
+        pygame.draw.rect(screen, (255, 0, 0), end_rect)
+        pygame.draw.rect(screen, (255, 200, 0), player.rect)
+        pygame.display.flip()
+        clock.tick(60)
+
+          # Exit the while loop to show the quiz interface
+
+def quiz(level):
+    root = tk.Tk()
+    app = IslamicQuizApp(root)
+    root.mainloop()
+
+    ans = app.answer_entry.get()
+    if ans.lower() == answers[level].lower():
+        return True
+    else:
+        return False
+
+lmaze = [
+    [
+        "WWWWWWWWWWWWWWWWWWWW",
+        "W                  W",
+        "W         WWWWWW   W",
+        "W   WWWW       W   W",
+        "W   W        WWWW  W",
+        "W WWW  WWWW        W",
+        "W   W     W W      W",
+        "W   W     W   WWW WW",
+        "W   WWW WWW   W W  W",
+        "W     W   W   W W  W",
+        "WWW   W   WWWWW W  W",
+        "W W      WW        W",
+        "W W   WWWW   WWW   W",
+        "W     W    E   W   W",
+        "WWWWWWWWWWWWWWWWWWWW",
+    ],
+    [
+        "WWWWWWWWWWWWWWWWWWWW",
+        "W                  W",
+        "W         WWWWWW   W",
+        "W   WWWW       W   W",
+        "W   W        WWWW  W",
+        "W WWW  WWWW        W",
+        "W   W     W W      W",
+        "W   W     W   WWW WW",
+        "W   WWW WWW   W W  W",
+        "W     W   W   W W  W",
+        "WWW   W   WWWWW W  W",
+        "W W      WW        W",
+        "W W   WWWW   WWW   W",
+        "W     W  E     W   W",
+        "WWWWWWWWWWWWWWWWWWWW",
+    ],
+    [
+        "WWWWWWWWWWWWWWWWWWWW",
+        "W                  W",
+        "W         WWWWWW   W",
+        "W   WWWW       W   W",
+        "W   W        WWWW  W",
+        "W WWW  WWWW        W",
+        "W   W     W W      W",
+        "W   W     W   WWW WW",
+        "W   WWW WWW   W W  W",
+        "W     W   W   W W  W",
+        "WWW   W   WWWWW W  W",
+        "W W      WW        W",
+        "W W   WWWW   WWW   W",
+        "W  E  W    E   W   W",
+        "WWWWWWWWWWWWWWWWWWWW",
+    ],
+    [
+        "WWWWWWWWWWWWWWWWWWWW",
+        "W                  W",
+        "W         WWWWWW   W",
+        "W   WWWW       W   W",
+        "W   W        WWWW  W",
+        "W WWW  WWWW        W",
+        "W   W     W W      W",
+        "W   W     W   WWW WW",
+        "W   WWW WWW   W W  W",
+        "W     W   W   W W  W",
+        "WWW   W   WWWWW W  W",
+        "W W      WW        W",
+        "W W   WWWW   WWW   W",
+        "W   E  W    E  W   W",
+        "WWWWWWWWWWWWWWWWWWWW",
+    ]
+]
+
+question = [
+    "What is the first pillar of Islam?",
+    "Who is the final prophet in Islam?",
+    "What is the holy book of Islam?",
+    "In which month do Muslims fast?",
+]
+answers = [
+    "Shahada",
+    "Muhammad",
+    "Quran",
+    "Ramadan"
+]
+
+
+
+if __name__ == "__main__":
+    walls = []  # Initialize walls globally
+    game(lmaze, 0)  # Start the game with maze_data and level 0
