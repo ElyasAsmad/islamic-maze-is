@@ -39,7 +39,22 @@ class GameSingleton:
         "WWW   W   WWWWW W  W",
         "W W   Q            W",
         "W W   WWWW   WWW   W",
-        "W     W    E   W   W",
+        "W     W        W  EW",
         "WWWWWWWWWWWWWWWWWWWW",
     ]
     
+    # level = [
+    #     "                  ",
+    #     "         WWWWWW   ",
+    #     "   WWWW       W   ",
+    #     "   W        WWWW  ",
+    #     " WWW  WWWW        ",
+    #     "   W     W W      ",
+    #     "   W     W   WWW W",
+    #     "   WWWQWWW   W W  ",
+    #     "     W   W   W W  ",
+    #     "WW   W   WWWWW W  ",
+    #     " W   Q            ",
+    #     " W   WWWW   WWW   ",
+    #     "     W    E   W   ",
+    # ]
