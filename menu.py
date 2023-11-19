@@ -11,7 +11,7 @@ class Menu:
     
     def __init__(self, root: tk.Tk):
         self.root = root
-        self.root.geometry('350x300')
+        self.root.geometry('350x500')
         self.root.resizable(width=False, height=False)
         
         main_frame = tk.Frame(self.root, bg=color1, pady=40)
@@ -47,10 +47,14 @@ class Menu:
         GameSingleton.game = Game(self.root)
             
     def create(self):
+        title = tk.Label(self.main_frame, text = 'ISlamic Maze Game', fg='WHITE', bg=color1)
+        title.config(font =("Inter", 24))
+        title.grid(column=0, row=0)
+        
         # Create a Button
         btn1 = self.create_button('Play', callback=self.init_game)
-        btn1.grid(column=0, row=0)
+        btn1.grid(column=0, row=1)
         
         btn2 = self.create_button('Quit', callback=self.root.destroy)
-        btn2.grid(column=0, row=1)
+        btn2.grid(column=0, row=2)
     
