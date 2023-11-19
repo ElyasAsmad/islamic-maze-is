@@ -9,7 +9,9 @@ class Player(object):
     def __init__(self):
         self.is_stopped = True
         self.rect = pygame.Rect(32, 32, 16, 16)
-        self.clock = pygame.time.Clock()
+
+    def get_position(self):
+        return (self.rect.x, self.rect.y)
 
     def move(self, dx, dy):
         
@@ -18,6 +20,41 @@ class Player(object):
             self.move_single_axis(dx, 0)
         if dy != 0:
             self.move_single_axis(0, dy)
+            
+    def move_to_position(self, x, y):
+        dx = x - self.rect.x
+        dy = y - self.rect.y
+
+        self.rect.x = x
+        self.rect.y = y
+        
+        for q_block in QuestionBlock.q_block_list:
+                
+            if self.rect.colliderect(q_block.rect):       
+                
+                question = GameQuestion(q_block.rect)
+                question.ask_player()
+                      
+                if dx > 0:
+                    self.rect.right = q_block.rect.left
+                if dx < 0:
+                    self.rect.left = q_block.rect.right
+                if dy > 0:
+                    self.rect.bottom = q_block.rect.top
+                if dy < 0:
+                    self.rect.top = q_block.rect.bottom        
+
+        for wall in Wall.walls:
+            if self.rect.colliderect(wall.rect):   
+                self.is_stopped = True
+                if dx > 0: # Moving right; Hit the left side of the wall
+                    self.rect.right = wall.rect.left
+                if dx < 0: # Moving left; Hit the right side of the wall
+                    self.rect.left = wall.rect.right
+                if dy > 0: # Moving down; Hit the top side of the wall
+                    self.rect.bottom = wall.rect.top
+                if dy < 0: # Moving up; Hit the bottom side of the wall
+                    self.rect.top = wall.rect.bottom
             
     def move_totm(self, dx, dy):
         
